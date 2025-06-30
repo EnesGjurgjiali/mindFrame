@@ -1,5 +1,54 @@
-# Vue 3 + Vite
+# 🧠 Personal Productivity Planner
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+A clean and modular **personal productivity web app** built using **Vue 3 (Composition API)** and **Tailwind CSS**. This app helps you efficiently manage your time, track your daily mood, and plan across day/week/month views — all stored locally in your browser.
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+---
+
+## ✨ Features
+
+### ✅ Task Manager
+
+- Add, edit, delete tasks
+- Color-coded by type (Work, Rest, Study, Personal, Prayer, etc.)
+- Tasks include start and end times
+
+### 📅 Calendar Views
+
+- Switch between **Day**, **Week**, and **Month** views
+- Click on any date to view or manage tasks
+
+### 🌤️ Mood / Rating Tracker
+
+- Assign a daily mood (1-5 stars or emoji)
+- Visual feedback shown on the calendar
+
+### 💾 Offline Persistence
+
+- Data stored in browser `localStorage`
+- Optional JSON **Export/Backup** support
+
+### 🕘 Timeline View _(Optional)_
+
+- Horizontal visual timeline of tasks for a selected day
+
+### 🔄 Drag & Drop Support
+
+- Rearrange tasks within the same day
+- Easily change time slots with intuitive drag-and-drop
+
+### 📱 Responsive Design
+
+- Mobile and desktop friendly
+- Built with Tailwind CSS for a clean, modern UI/UX
+
+---
+
+## 🔧 Tech Stack
+
+- **Vue 3** – Composition API
+- **Tailwind CSS (v4)** – Fully responsive and utility-first styling
+- **localStorage** – Browser-based data persistence
+
+
+Made with 💻 by Enes Gjurgjiali
+```
