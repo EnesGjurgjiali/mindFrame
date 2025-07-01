@@ -132,6 +132,7 @@ const handleSaveTask = (task) => {
       :task="editingTask"
       @close="closeModal"
       @save="handleSaveTask"
+      class="z-10"
     />
   </div>
 
@@ -144,7 +145,7 @@ const handleSaveTask = (task) => {
     </button>
   </div>
 
-  <div class="relative flex items-center my-8">
+  <div class="relative flex items-center my-8 z-0">
     <div class="flex-grow border-t border-gray-200"></div>
     <span
       class="mx-4 text-gray-400 font-semibold tracking-wide uppercase text-xs bg-white px-2"

@@ -1,6 +1,6 @@
-# 🧠 Personal Productivity Planner
+# 🧠 mindFrame – Personal Productivity Planner
 
-A clean and modular **personal productivity web app** built using **Vue 3 (Composition API)** and **Tailwind CSS**. This app helps you efficiently manage your time, track your daily mood, and plan across day/week/month views — all stored locally in your browser.
+A clean, modular, and modern **personal productivity web app** built with **Vue 3 (Composition API)** and **Tailwind CSS**. mindFrame helps you efficiently manage your time, track your daily mood, plan across day/week/month views, and now even track your expenses — all stored locally in your browser for privacy and speed.
 
 ---
 
@@ -21,6 +21,14 @@ A clean and modular **personal productivity web app** built using **Vue 3 (Compo
 
 - Assign a daily mood (1-5 stars or emoji)
 - Visual feedback shown on the calendar
+
+### 💸 Expense Tracker (NEW!)
+
+- Log daily expenses with amount, description, and category
+- Set and track daily & monthly budgets
+- See total spent and remaining for today and this month
+- Edit/delete expenses, all stored locally
+- Smooth, collapsible UI that blends with the app
 
 ### 💾 Offline Persistence
 
@@ -43,12 +51,42 @@ A clean and modular **personal productivity web app** built using **Vue 3 (Compo
 
 ---
 
-## 🔧 Tech Stack
+## 🚀 Getting Started
 
-- **Vue 3** – Composition API
-- **Tailwind CSS (v4)** – Fully responsive and utility-first styling
-- **localStorage** – Browser-based data persistence
+### Prerequisites
 
+- [Node.js](https://nodejs.org/) (v16 or newer recommended)
+- [Git](https://git-scm.com/)
+
+### Clone & Run
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/mindFrame.git
+   cd mindFrame
+   ```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+3. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+4. Open your browser and go to the local address shown (usually `http://localhost:5173/`).
+
+---
+
+## 📦 Build for Production
+
+```bash
+npm run build
+```
+
+The output will be in the `dist/` folder.
+
+---
+
+---
 
 Made with 💻 by Enes Gjurgjiali
-```
