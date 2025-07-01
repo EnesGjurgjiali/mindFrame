@@ -9,7 +9,7 @@ const props = defineProps({
   },
 });
 
-defineEmits(["delete", "edit"]);
+defineEmits(["delete", "edit", "toggle-completed"]);
 </script>
 
 <template>
@@ -17,9 +17,15 @@ defineEmits(["delete", "edit"]);
     class="p-4 border rounded-lg shadow-sm flex justify-between items-center"
     :class="getTaskTypeClass(task.type)"
   >
-    <div class="flex items-center">
+    <div class="flex items-center w-full">
+      <input
+        type="checkbox"
+        class="mr-4 accent-blue-500 h-5 w-5"
+        :checked="task.completed"
+        @change="$emit('toggle-completed', task.id)"
+      />
       <span class="text-2xl mr-4">{{ taskEmojis[task.type] }}</span>
-      <div>
+      <div :class="task.completed ? 'opacity-60 line-through' : ''">
         <h3 class="font-bold">
           {{ task.title }}
           <span v-if="task.rating" class="text-yellow-500 ml-2"

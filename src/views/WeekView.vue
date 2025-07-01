@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, defineEmits } from "vue";
+import { ref, computed } from "vue";
 import { useTasks } from "../composables/useTasks";
 import DayCard from "../components/DayCard.vue";
 import { toYYYYMMDD } from "../utils/date";

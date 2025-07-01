@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, defineEmits } from "vue";
+import { ref, computed } from "vue";
 import { useTasks } from "../composables/useTasks";
 import { useMoods } from "../composables/useMoods";
 import { toYYYYMMDD } from "../utils/date";
@@ -126,7 +126,9 @@ const selectDay = (day) => {
       >
         &lt;
       </button>
-      <h2 class="text-2xl font-bold">{{ monthName }} {{ year }}</h2>
+      <h2 class="text-2xl font-bold text-gray-900">
+        {{ monthName }} {{ year }}
+      </h2>
       <button
         @click="nextMonth"
         class="px-4 py-2 bg-gray-200 rounded cursor-pointer"
@@ -134,46 +136,48 @@ const selectDay = (day) => {
         &gt;
       </button>
     </div>
-    <div
-      class="grid grid-cols-7 gap-px bg-gray-200 border-l border-t border-gray-200"
-    >
+    <div class="overflow-x-auto">
       <div
-        v-for="dayName in dayNames"
-        :key="dayName"
-        class="py-2 text-center font-semibold bg-white border-r border-b border-gray-200"
+        class="grid grid-cols-7 gap-px sm:gap-1 bg-gray-200 border-l border-t border-gray-200 min-w-[500px]"
       >
-        {{ dayName }}
-      </div>
-      <div
-        v-for="day in days"
-        :key="day.date"
-        class="p-2 h-32 bg-white border-r border-b border-gray-200 overflow-y-auto cursor-pointer hover:bg-gray-100"
-        :class="{ 'bg-gray-50': !day.isCurrentMonth }"
-        @click="selectDay(day)"
-      >
-        <div class="flex justify-between items-center">
-          <div
-            class="font-semibold"
-            :class="{
-              'text-gray-400': !day.isCurrentMonth,
-              'text-white bg-blue-600 rounded-full h-8 w-8 flex items-center justify-center':
-                day.date === today && day.isCurrentMonth,
-            }"
-          >
-            {{ day.dayOfMonth }}
-          </div>
-          <div v-if="moods[day.date]" class="text-xl">
-            {{ moodEmojis[moods[day.date]] }}
-          </div>
+        <div
+          v-for="dayName in dayNames"
+          :key="dayName"
+          class="py-2 text-center font-semibold bg-white border-r border-b border-gray-200 text-xs sm:text-sm text-gray-800"
+        >
+          {{ dayName }}
         </div>
-        <div class="mt-1 space-y-1">
-          <div
-            v-for="task in tasksByDate[day.date]"
-            :key="task.id"
-            class="text-xs p-1 rounded"
-            :class="getTaskCardClass(task.type)"
-          >
-            {{ task.title }}
+        <div
+          v-for="day in days"
+          :key="day.date"
+          class="p-2 h-32 bg-white border-r border-b border-gray-200 overflow-y-auto cursor-pointer hover:bg-gray-100 text-xs sm:text-sm text-gray-800"
+          :class="{ 'bg-gray-50': !day.isCurrentMonth }"
+          @click="selectDay(day)"
+        >
+          <div class="flex justify-between items-center">
+            <div
+              class="font-semibold"
+              :class="{
+                'text-gray-400': !day.isCurrentMonth,
+                'text-white bg-blue-600 rounded-full h-8 w-8 flex items-center justify-center':
+                  day.date === today && day.isCurrentMonth,
+              }"
+            >
+              {{ day.dayOfMonth }}
+            </div>
+            <div v-if="moods[day.date]" class="text-xl">
+              {{ moodEmojis[moods[day.date]] }}
+            </div>
+          </div>
+          <div class="mt-1 space-y-1">
+            <div
+              v-for="task in tasksByDate[day.date]"
+              :key="task.id"
+              class="text-xs p-1 rounded"
+              :class="getTaskCardClass(task.type)"
+            >
+              {{ task.title }}
+            </div>
           </div>
         </div>
       </div>

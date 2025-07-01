@@ -15,7 +15,12 @@ export function useTasks(date = null) {
   const addTask = (task, taskDate) => {
     const newTaskDate =
       taskDate || (date && date.value) || toYYYYMMDD(new Date());
-    allTasks.value.push({ ...task, id: Date.now(), date: newTaskDate });
+    allTasks.value.push({
+      ...task,
+      id: Date.now(),
+      date: newTaskDate,
+      completed: false,
+    });
   };
 
   const editTask = (updatedTask) => {
@@ -23,7 +28,7 @@ export function useTasks(date = null) {
       (task) => task.id === updatedTask.id
     );
     if (index !== -1) {
-      allTasks.value[index] = updatedTask;
+      allTasks.value[index] = { ...allTasks.value[index], ...updatedTask };
     }
   };
 
@@ -35,11 +40,19 @@ export function useTasks(date = null) {
     allTasks.value = newTasks;
   };
 
+  const toggleTaskCompletion = (taskId) => {
+    const idx = allTasks.value.findIndex((task) => task.id === taskId);
+    if (idx !== -1) {
+      allTasks.value[idx].completed = !allTasks.value[idx].completed;
+    }
+  };
+
   return {
     tasks,
     addTask,
     editTask,
     deleteTask,
     updateTaskOrder,
+    toggleTaskCompletion,
   };
 }

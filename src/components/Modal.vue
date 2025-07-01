@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, defineEmits, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 
 const props = defineProps({
   task: {
@@ -16,18 +16,23 @@ const form = ref({
   type: "Work",
   start: "",
   end: "",
-  rating: 0,
+  rating: "",
   description: "",
 });
 
 onMounted(() => {
   if (props.task) {
     form.value = { ...props.task };
+    if (form.value.rating === 0) form.value.rating = "";
   }
 });
 
 const saveTask = () => {
-  emit("save", form.value);
+  const toSave = { ...form.value };
+  if (toSave.rating === "" || toSave.rating === null) {
+    delete toSave.rating;
+  }
+  emit("save", toSave);
   emit("close");
 };
 </script>
@@ -38,7 +43,7 @@ const saveTask = () => {
     id="my-modal"
     @click.self="$emit('close')"
   >
-    <div class="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div class="relative mx-auto p-5 border border-gray-300 w-96 shadow-lg rounded-md bg-white">
       <div class="mt-3 text-center">
         <h3 class="text-lg leading-6 font-medium text-gray-900">
           {{ form.id ? "Edit Task" : "Add Task" }}
@@ -113,12 +118,13 @@ const saveTask = () => {
             >
             <input
               type="number"
-              v-model.number="form.rating"
+              v-model="form.rating"
               id="rating"
               min="1"
               max="5"
               class="mt-1 p-2 w-full border rounded-md"
             />
+            <span class="text-xs text-gray-400">(Optional)</span>
           </div>
           <div class="items-center px-4 py-3">
             <button

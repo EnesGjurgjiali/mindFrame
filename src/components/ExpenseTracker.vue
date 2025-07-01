@@ -1,36 +1,38 @@
 <template>
   <div
-    class="expense-tracker rounded-lg border border-gray-200 shadow p-4 bg-white space-y-4 mt-6"
+    class="expense-tracker rounded-lg border border-gray-200 shadow p-2 sm:p-4 bg-white space-y-4 mt-6"
   >
     <div
-      class="flex items-center justify-between mb-2 cursor-pointer select-none hover:bg-gray-50 rounded transition"
+      class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 cursor-pointer select-none hover:bg-gray-50 rounded transition"
       @click="toggleCollapse"
     >
-      <h2 class="text-lg font-semibold">Expense Tracker</h2>
-      <div class="flex items-center space-x-2">
-        <div class="flex space-x-2" v-if="!collapsed">
-          <label class="flex items-center text-sm" @click.stop>
+      <h2 class="text-lg font-semibold mb-2 sm:mb-0">Expense Tracker</h2>
+      <div
+        class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto"
+      >
+        <div class="flex space-x-2 w-full sm:w-auto" v-if="!collapsed">
+          <label class="flex items-center text-sm w-full sm:w-auto" @click.stop>
             <span class="mr-1">Daily Budget:</span>
             <input
               type="number"
               v-model.number="dailyBudgetInput"
               @change="updateDailyBudget"
               min="0"
-              class="w-20 px-2 py-1 border rounded text-sm"
+              class="w-full sm:w-20 px-2 py-1 border border-gray-300 rounded text-sm"
             />
           </label>
-          <label class="flex items-center text-sm" @click.stop>
+          <label class="flex items-center text-sm w-full sm:w-auto" @click.stop>
             <span class="mr-1">Monthly Budget:</span>
             <input
               type="number"
               v-model.number="monthlyBudgetInput"
               @change="updateMonthlyBudget"
               min="0"
-              class="w-24 px-2 py-1 border rounded text-sm"
+              class="w-full sm:w-24 px-2 py-1 border border-gray-300 rounded text-sm"
             />
           </label>
         </div>
-        <span class="ml-2 p-1 rounded transition">
+        <span class="ml-0 sm:ml-2 p-1 rounded transition self-end sm:self-auto">
           <svg
             :class="[
               'w-5 h-5 transition-transform',
@@ -57,11 +59,11 @@
         >
           <div class="flex-1 flex flex-col gap-1">
             <div>
-              <span class="font-medium">Spent Today:</span>
+              <span class="font-medium">Spent Today: </span>
               <span class="text-red-600">{{ totalToday.toFixed(2) }} €</span>
             </div>
             <div>
-              <span class="font-medium">Remaining Today:</span>
+              <span class="font-medium">Remaining Today: </span>
               <span
                 :class="
                   dailyBudget - totalToday < 0
@@ -75,14 +77,14 @@
           </div>
           <div class="hidden md:block w-px bg-gray-200 mx-2"></div>
           <div
-            class="flex-1 flex flex-col gap-1 md:pl-4 md:border-l md:border-gray-200"
+            class="flex-1 flex flex-col gap-1 md:pl-4 md:border-l md:border-gray-200 mt-2 md:mt-0"
           >
             <div>
-              <span class="font-medium">Spent This Month:</span>
+              <span class="font-medium">Spent This Month: </span>
               <span class="text-red-600">{{ totalMonth.toFixed(2) }} €</span>
             </div>
             <div>
-              <span class="font-medium">Remaining This Month:</span>
+              <span class="font-medium">Remaining This Month: </span>
               <span
                 :class="
                   monthlyBudget - totalMonth < 0
@@ -97,7 +99,7 @@
         </div>
         <form
           @submit.prevent="onSubmit"
-          class="flex flex-col md:flex-row md:items-end gap-2 border-t border-gray-100 pt-4"
+          class="flex flex-col sm:flex-row sm:items-end gap-2 border-t border-gray-100 pt-4"
         >
           <input
             v-model="form.amount"
@@ -106,25 +108,25 @@
             min="0"
             placeholder="Amount (€)"
             required
-            class="px-2 py-1 border rounded w-24 text-sm"
+            class="px-2 py-1 border border-gray-300 rounded w-full sm:w-24 text-sm"
           />
           <input
             v-model="form.description"
             type="text"
             placeholder="Description"
             required
-            class="px-2 py-1 border rounded flex-1 text-sm"
+            class="px-2 py-1 border border-gray-300 rounded w-full flex-1 text-sm"
           />
           <input
             v-model="form.category"
             type="text"
             placeholder="Category"
-            class="px-2 py-1 border rounded w-28 text-sm"
+            class="px-2 py-1 border border-gray-300 rounded w-full sm:w-28 text-sm"
           />
-          <div class="flex gap-2">
+          <div class="flex gap-2 w-full sm:w-auto">
             <button
               type="submit"
-              class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"
+              class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm w-full sm:w-auto"
             >
               {{ editingId ? "Update" : "Add" }}
             </button>
@@ -132,7 +134,7 @@
               v-if="editingId"
               type="button"
               @click="cancelEdit"
-              class="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 text-sm"
+              class="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 text-sm w-full sm:w-auto"
             >
               Cancel
             </button>
@@ -142,7 +144,7 @@
           <li
             v-for="expense in expensesToday"
             :key="expense.id"
-            class="flex justify-between items-center py-2"
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center py-2 gap-1 sm:gap-0"
           >
             <div>
               <span class="font-medium text-red-600"
@@ -154,7 +156,7 @@
                 >({{ expense.category }})</span
               >
             </div>
-            <div class="flex gap-2">
+            <div class="flex gap-2 mt-1 sm:mt-0">
               <button
                 @click="startEdit(expense)"
                 class="text-gray-500 hover:text-blue-600"

@@ -46,7 +46,7 @@ watch(
 
 <template>
   <div class="flex items-center space-x-2">
-    <span>{{ isEditable ? "How was your day?" : "Your mood:" }}</span>
+    <span>{{ isEditable ? "How's your day going?" : "The day's mood was:" }}</span>
     <template v-if="isEditable">
       <button
         v-for="mood in moods"
@@ -54,7 +54,7 @@ watch(
         @click="setMood(mood.value)"
         :class="[
           'p-2 rounded-full cursor-pointer',
-          { 'bg-yellow-400': selectedMood === mood.value },
+          { 'bg-gray-300': selectedMood === mood.value },
         ]"
       >
         {{ mood.emoji }}

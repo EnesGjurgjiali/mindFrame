@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, defineProps, defineEmits } from "vue";
+import { ref, computed } from "vue";
 import draggable from "vuedraggable";
 import { useTasks } from "../composables/useTasks";
 import TaskItem from "../components/TaskItem.vue";
@@ -26,9 +26,17 @@ const isMoodEditable = computed(() => {
   return props.currentDate === today;
 });
 
-const { tasks, addTask, editTask, deleteTask, updateTaskOrder } = useTasks();
+const {
+  tasks,
+  addTask,
+  editTask,
+  deleteTask,
+  updateTaskOrder,
+  toggleTaskCompletion,
+} = useTasks();
 const showModal = ref(false);
 const editingTask = ref(null);
+const showCompleted = ref(false);
 
 const tasksForDay = computed({
   get() {
@@ -40,6 +48,12 @@ const tasksForDay = computed({
     );
     updateTaskOrder([...otherTasks, ...newTasks]);
   },
+});
+
+const visibleTasksForDay = computed(() => {
+  return tasksForDay.value.filter(
+    (task) => showCompleted.value || !task.completed
+  );
 });
 
 const onDragEnd = () => {
@@ -88,19 +102,45 @@ const handleSaveTask = (task) => {
     <div class="flex justify-between items-center mb-4">
       <button
         @click="changeDay(-1)"
-        class="px-4 py-2 bg-gray-200 rounded cursor-pointer"
+        class="px-2 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded cursor-pointer flex items-center justify-center text-lg sm:text-base"
       >
-        &lt; Prev
+        <svg
+          class="w-5 h-5 sm:hidden"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+        <span class="hidden sm:inline">&lt; Prev</span>
       </button>
       <div class="text-center">
-        <h2 class="text-xl font-semibold">Day View</h2>
+        <h2 class="text-xl font-semibold text-gray-900">Day View</h2>
         <p class="text-gray-600">{{ formattedDate }}</p>
       </div>
       <button
         @click="changeDay(1)"
-        class="px-4 py-2 bg-gray-200 rounded cursor-pointer"
+        class="px-2 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded cursor-pointer flex items-center justify-center text-lg sm:text-base"
       >
-        Next &gt;
+        <span class="hidden sm:inline">Next &gt;</span>
+        <svg
+          class="w-5 h-5 sm:hidden"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
       </button>
     </div>
 
@@ -111,6 +151,18 @@ const handleSaveTask = (task) => {
       class="mb-4"
     />
 
+    <div class="flex items-center mb-2">
+      <input
+        type="checkbox"
+        id="showCompleted"
+        v-model="showCompleted"
+        class="mr-2 accent-blue-500"
+      />
+      <label for="showCompleted" class="text-sm text-gray-700 select-none"
+        >Show completed tasks</label
+      >
+    </div>
+
     <draggable
       v-model="tasksForDay"
       tag="div"
@@ -120,9 +172,11 @@ const handleSaveTask = (task) => {
     >
       <template #item="{ element: task }">
         <TaskItem
+          v-if="showCompleted || !task.completed"
           :task="task"
           @edit="openModal(task)"
           @delete="deleteTask(task.id)"
+          @toggle-completed="toggleTaskCompletion"
         />
       </template>
     </draggable>

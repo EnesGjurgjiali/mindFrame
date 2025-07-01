@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, defineProps, defineEmits } from "vue";
+import { ref, computed } from "vue";
 import { useTasks } from "../composables/useTasks";
 import { toYYYYMMDD } from "../utils/date";
 import { getTimelineTaskClass } from "../utils/taskUtils";
@@ -89,32 +89,34 @@ const getTaskStyle = (task) => {
 </script>
 
 <template>
-  <div>
-    <h2 class="text-2xl font-bold mb-4">Timeline View</h2>
+  <div class="text-gray-800">
+    <h2 class="text-2xl font-bold mb-4 text-gray-900">Timeline View</h2>
     <input
       type="date"
       v-model="selectedDate"
       @change="onDateChange"
-      class="mb-4 p-2 border rounded"
+      class="mb-4 p-2 border rounded w-full max-w-xs"
     />
 
     <div class="relative h-[600px] overflow-x-auto border">
-      <div class="relative w-[1440px] h-full">
+      <div class="relative min-w-[600px] w-[1440px] h-full">
         <!-- Hour markers -->
         <div
           v-for="hour in 24"
           :key="hour"
-          class="absolute h-full border-r"
+          class="absolute h-full border-r text-xs sm:text-sm text-gray-500"
           :style="{ left: `${(hour - 1) * 60}px` }"
         >
-          <span class="absolute -top-5 left-1 text-xs">{{ hour - 1 }}:00</span>
+          <span class="absolute -top-5 left-1 text-xs sm:text-sm text-gray-500"
+            >{{ hour - 1 }}:00</span
+          >
         </div>
 
         <!-- Tasks -->
         <div
           v-for="task in tasksForSelectedDate"
           :key="task.id"
-          class="timeline-task absolute h-10 rounded-lg p-2 text-white"
+          class="timeline-task absolute h-10 rounded-lg p-2 text-white text-xs sm:text-sm"
           :style="getTaskStyle(task)"
           :class="getTimelineTaskClass(task.type)"
           @mousedown="handleMouseDown($event, task)"

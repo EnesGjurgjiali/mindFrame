@@ -32,19 +32,24 @@ const setViewWithDate = ({ view, date }) => {
 </script>
 
 <template>
-  <div id="app" class="bg-gray-100 min-h-screen">
+  <div id="app" class="bg-gray-100 min-h-screen w-full text-gray-800">
     <Header :currentView="currentView" @setView="setView" />
-    <main class="p-4">
-      <!-- The router-view or main content will go here -->
+    <main class="p-2 sm:p-4 w-full max-w-auto mx-auto">
+      <component
+        :is="views[currentView]"
+        :current-date="currentDate"
+        @change-date="changeDate"
+        v-if="currentView === 'DayView' || currentView === 'TimelineView'"
+      />
       <component
         :is="views[currentView]"
         :current-date="currentDate"
         @change-date="changeDate"
         @set-view-with-date="setViewWithDate"
+        v-else
       />
     </main>
   </div>
 </template>
 
-<style>
-</style>
+<style></style>

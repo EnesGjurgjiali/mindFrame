@@ -87,6 +87,4 @@ The output will be in the `dist/` folder.
 
 ---
 
----
-
 Made with 💻 by Enes Gjurgjiali
