@@ -5,6 +5,7 @@ import { useTasks } from "../composables/useTasks";
 import TaskItem from "../components/TaskItem.vue";
 import Modal from "../components/Modal.vue";
 import MoodTracker from "../components/MoodTracker.vue";
+import ExpenseTracker from "../components/ExpenseTracker.vue";
 import { toYYYYMMDD } from "../utils/date";
 
 const props = defineProps({
@@ -91,7 +92,7 @@ const handleSaveTask = (task) => {
       >
         &lt; Prev
       </button>
-      <div>
+      <div class="text-center">
         <h2 class="text-xl font-semibold">Day View</h2>
         <p class="text-gray-600">{{ formattedDate }}</p>
       </div>
@@ -100,15 +101,6 @@ const handleSaveTask = (task) => {
         class="px-4 py-2 bg-gray-200 rounded cursor-pointer"
       >
         Next &gt;
-      </button>
-    </div>
-
-    <div class="flex justify-end mb-4">
-      <button
-        @click="openModal()"
-        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 cursor-pointer"
-      >
-        Add Task
       </button>
     </div>
 
@@ -123,7 +115,7 @@ const handleSaveTask = (task) => {
       v-model="tasksForDay"
       tag="div"
       item-key="id"
-      class="space-y-4"
+      class="space-y-4 cursor-move"
       @end="onDragEnd"
     >
       <template #item="{ element: task }">
@@ -142,6 +134,26 @@ const handleSaveTask = (task) => {
       @save="handleSaveTask"
     />
   </div>
+
+  <div class="flex justify-center mt-4">
+    <button
+      @click="openModal()"
+      class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 cursor-pointer"
+    >
+      + Add Task
+    </button>
+  </div>
+
+  <div class="relative flex items-center my-8">
+    <div class="flex-grow border-t border-gray-200"></div>
+    <span
+      class="mx-4 text-gray-400 font-semibold tracking-wide uppercase text-xs bg-white px-2"
+      >Expenses</span
+    >
+    <div class="flex-grow border-t border-gray-200"></div>
+  </div>
+
+  <ExpenseTracker :date="currentDate" />
 </template>
 
 <style scoped></style>

@@ -47,5 +47,4 @@ const setViewWithDate = ({ view, date }) => {
 </template>
 
 <style>
-/* Global styles can go here if needed, but we'll use Tailwind classes primarily. */
 </style>

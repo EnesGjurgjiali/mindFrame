@@ -20,8 +20,16 @@ defineEmits(["delete", "edit"]);
     <div class="flex items-center">
       <span class="text-2xl mr-4">{{ taskEmojis[task.type] }}</span>
       <div>
-        <h3 class="font-bold">{{ task.title }}</h3>
+        <h3 class="font-bold">
+          {{ task.title }}
+          <span v-if="task.rating" class="text-yellow-500 ml-2"
+            >({{ task.rating }} ★)</span
+          >
+        </h3>
         <p class="text-sm text-gray-600">{{ task.start }} - {{ task.end }}</p>
+        <p v-if="task.description" class="text-sm text-gray-500 mt-1">
+          {{ task.description }}
+        </p>
       </div>
     </div>
     <div class="flex items-center space-x-2">

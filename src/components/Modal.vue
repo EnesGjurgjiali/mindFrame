@@ -16,6 +16,8 @@ const form = ref({
   type: "Work",
   start: "",
   end: "",
+  rating: 0,
+  description: "",
 });
 
 onMounted(() => {
@@ -32,13 +34,11 @@ const saveTask = () => {
 
 <template>
   <div
-    class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
+    class="fixed inset-0 bg-opacity-50 overflow-y-auto h-full w-full backdrop-blur-sm flex items-start justify-center pt-10 pb-10"
     id="my-modal"
     @click.self="$emit('close')"
   >
-    <div
-      class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
-    >
+    <div class="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
       <div class="mt-3 text-center">
         <h3 class="text-lg leading-6 font-medium text-gray-900">
           {{ form.id ? "Edit Task" : "Add Task" }}
@@ -54,6 +54,19 @@ const saveTask = () => {
               id="title"
               class="mt-1 p-2 w-full border rounded-md"
             />
+          </div>
+          <div class="mb-4">
+            <label
+              for="description"
+              class="block text-sm font-medium text-gray-700"
+              >Description</label
+            >
+            <textarea
+              v-model="form.description"
+              id="description"
+              rows="3"
+              class="mt-1 p-2 w-full border rounded-md"
+            ></textarea>
           </div>
           <div class="mb-4">
             <label for="type" class="block text-sm font-medium text-gray-700"
@@ -91,6 +104,19 @@ const saveTask = () => {
               type="time"
               v-model="form.end"
               id="end"
+              class="mt-1 p-2 w-full border rounded-md"
+            />
+          </div>
+          <div class="mb-4">
+            <label for="rating" class="block text-sm font-medium text-gray-700"
+              >Rating (1-5)</label
+            >
+            <input
+              type="number"
+              v-model.number="form.rating"
+              id="rating"
+              min="1"
+              max="5"
               class="mt-1 p-2 w-full border rounded-md"
             />
           </div>
