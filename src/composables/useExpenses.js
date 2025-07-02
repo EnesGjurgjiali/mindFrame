@@ -1,7 +1,7 @@
 import { ref } from "vue";
 
 const EXPENSES_KEY = "expenses";
-const DAILY_BUDGET_KEY = "dailyBudget";
+const DAILY_BUDGETS_KEY = "dailyBudgets";
 const MONTHLY_BUDGET_KEY = "monthlyBudget";
 
 function loadExpenses() {
@@ -62,11 +62,29 @@ export function useExpenses() {
   }
 
   // Budget functions
-  function setDailyBudget(amount) {
-    localStorage.setItem(DAILY_BUDGET_KEY, amount);
+  function setDailyBudget(amount, date) {
+    // date: 'YYYY-MM-DD'
+    const budgets = JSON.parse(localStorage.getItem(DAILY_BUDGETS_KEY) || "{}");
+    budgets[date] = amount;
+    localStorage.setItem(DAILY_BUDGETS_KEY, JSON.stringify(budgets));
   }
-  function getDailyBudget() {
-    return parseFloat(localStorage.getItem(DAILY_BUDGET_KEY) || "0");
+  function getDailyBudget(date) {
+    // date: 'YYYY-MM-DD'
+    const budgets = JSON.parse(localStorage.getItem(DAILY_BUDGETS_KEY) || "{}");
+    if (budgets[date] !== undefined) {
+      return parseFloat(budgets[date]);
+    }
+    // Try previous days
+    let prev = new Date(date);
+    for (let i = 0; i < 30; i++) {
+      // look back up to 30 days
+      prev.setDate(prev.getDate() - 1);
+      const prevStr = prev.toISOString().slice(0, 10);
+      if (budgets[prevStr] !== undefined) {
+        return parseFloat(budgets[prevStr]);
+      }
+    }
+    return 0;
   }
   function setMonthlyBudget(amount) {
     localStorage.setItem(MONTHLY_BUDGET_KEY, amount);

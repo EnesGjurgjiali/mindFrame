@@ -18,12 +18,14 @@ const form = ref({
   end: "",
   rating: "",
   description: "",
+  repeat: "None",
 });
 
 onMounted(() => {
   if (props.task) {
-    form.value = { ...props.task };
+    form.value = { repeat: "None", ...props.task };
     if (form.value.rating === 0) form.value.rating = "";
+    if (!form.value.repeat) form.value.repeat = "None";
   }
 });
 
@@ -43,7 +45,9 @@ const saveTask = () => {
     id="my-modal"
     @click.self="$emit('close')"
   >
-    <div class="relative mx-auto p-5 border border-gray-300 w-96 shadow-lg rounded-md bg-white">
+    <div
+      class="relative mx-auto p-5 border border-gray-300 w-96 shadow-lg rounded-md bg-white"
+    >
       <div class="mt-3 text-center">
         <h3 class="text-lg leading-6 font-medium text-gray-900">
           {{ form.id ? "Edit Task" : "Add Task" }}
@@ -111,6 +115,21 @@ const saveTask = () => {
               id="end"
               class="mt-1 p-2 w-full border rounded-md"
             />
+          </div>
+          <div class="mb-4">
+            <label for="repeat" class="block text-sm font-medium text-gray-700"
+              >Repeat</label
+            >
+            <select
+              v-model="form.repeat"
+              id="repeat"
+              class="mt-1 p-2 w-full border rounded-md"
+            >
+              <option value="None">None</option>
+              <option value="Every Day">Every Day</option>
+              <option value="Weekdays Only">Weekdays Only</option>
+              <option value="Weekends Only">Weekends Only</option>
+            </select>
           </div>
           <div class="mb-4">
             <label for="rating" class="block text-sm font-medium text-gray-700"

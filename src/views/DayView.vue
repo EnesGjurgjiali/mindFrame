@@ -88,10 +88,38 @@ const changeDay = (offset) => {
 };
 
 const handleSaveTask = (task) => {
-  if (task.id) {
-    editTask(task);
+  const repeat = task.repeat || "None";
+  if (task.id || repeat === "None") {
+    if (task.id) {
+      editTask(task);
+    } else {
+      addTask(task, props.currentDate);
+    }
   } else {
-    addTask(task, props.currentDate);
+    // Generate dates for the current week
+    const baseDate = new Date(props.currentDate.replace(/-/g, "/"));
+    const weekStart = new Date(baseDate);
+    weekStart.setDate(baseDate.getDate() - baseDate.getDay()); // Sunday
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(weekStart);
+      d.setDate(weekStart.getDate() + i);
+      const day = d.getDay();
+      if (
+        repeat === "Every Day" ||
+        (repeat === "Weekdays Only" && day >= 1 && day <= 5) ||
+        (repeat === "Weekends Only" && (day === 0 || day === 6))
+      ) {
+        const isCurrent = toYYYYMMDD(d) === props.currentDate;
+        addTask(
+          {
+            ...task,
+            repeat: undefined,
+            description: isCurrent ? task.description : "",
+          },
+          toYYYYMMDD(d)
+        );
+      }
+    }
   }
   closeModal();
 };

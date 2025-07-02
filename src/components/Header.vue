@@ -79,7 +79,20 @@ function closeDesktopMenu() {
 <template>
   <header class="bg-gray-800 text-gray-100 p-4 w-full">
     <div class="container mx-auto flex justify-between items-center w-full">
-      <h1 class="text-2xl font-bold text-gray-100">MindFrame</h1>
+      <div class="flex items-center space-x-2">
+        <img
+          src="/logo.png"
+          alt="MindFrame Logo"
+          class="h-10 w-10 object-contain cursor-pointer"
+          @click="$emit('setView', 'DayView')"
+        />
+        <h1
+          class="text-2xl font-bold text-gray-100 cursor-pointer"
+          @click="$emit('setView', 'DayView')"
+        >
+          MindFrame
+        </h1>
+      </div>
 
       <!-- Desktop Menu -->
       <nav class="hidden md:flex items-center space-x-4 overflow-x-auto">

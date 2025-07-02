@@ -1,3 +1,111 @@
+<script setup>
+import { ref, computed, watch } from "vue";
+import { useExpenses } from "../composables/useExpenses";
+
+const props = defineProps({
+  date: { type: String, required: true }, // format: YYYY-MM-DD
+});
+
+const month = computed(() => props.date.slice(0, 7));
+
+const {
+  getExpensesByDate,
+  getExpensesByMonth,
+  addExpense,
+  editExpense,
+  deleteExpense: removeExpense,
+  getTotalByDate,
+  getTotalByMonth,
+  getDailyBudget,
+  setDailyBudget,
+  getMonthlyBudget,
+  setMonthlyBudget,
+} = useExpenses();
+
+const form = ref({ amount: "", description: "", category: "" });
+const editingId = ref(null);
+
+const expensesToday = computed(() => getExpensesByDate(props.date));
+const totalToday = computed(() => getTotalByDate(props.date));
+const totalMonth = computed(() => getTotalByMonth(month.value));
+
+const dailyBudget = ref(getDailyBudget(props.date));
+const monthlyBudget = ref(getMonthlyBudget());
+const dailyBudgetInput = ref(dailyBudget.value);
+const monthlyBudgetInput = ref(monthlyBudget.value);
+
+const collapsed = ref(false);
+
+function toggleCollapse() {
+  collapsed.value = !collapsed.value;
+}
+
+function onSubmit() {
+  if (editingId.value) {
+    editExpense(editingId.value, {
+      amount: parseFloat(form.value.amount),
+      description: form.value.description,
+      category: form.value.category,
+    });
+    editingId.value = null;
+  } else {
+    addExpense({
+      date: props.date,
+      amount: parseFloat(form.value.amount),
+      description: form.value.description,
+      category: form.value.category,
+    });
+  }
+  form.value = { amount: "", description: "", category: "" };
+}
+
+function startEdit(expense) {
+  editingId.value = expense.id;
+  form.value = {
+    amount: expense.amount,
+    description: expense.description,
+    category: expense.category,
+  };
+}
+
+function cancelEdit() {
+  editingId.value = null;
+  form.value = { amount: "", description: "", category: "" };
+}
+
+function deleteExpense(id) {
+  removeExpense(id);
+  if (editingId.value === id) {
+    cancelEdit();
+  }
+}
+
+function updateDailyBudget() {
+  setDailyBudget(dailyBudgetInput.value, props.date);
+  dailyBudget.value = getDailyBudget(props.date);
+}
+function updateMonthlyBudget() {
+  setMonthlyBudget(monthlyBudgetInput.value);
+  monthlyBudget.value = getMonthlyBudget();
+}
+
+// Keep budgets in sync if changed elsewhere
+watch(
+  () => getDailyBudget(props.date),
+  (val) => {
+    dailyBudget.value = val;
+    dailyBudgetInput.value = val;
+  }
+);
+watch(
+  () => getMonthlyBudget(),
+  (val) => {
+    monthlyBudget.value = val;
+    monthlyBudgetInput.value = val;
+  }
+);
+</script>
+
 <template>
   <div
     class="expense-tracker rounded-lg border border-gray-200 shadow p-2 sm:p-4 bg-white space-y-4 mt-6"
@@ -204,114 +312,6 @@
     </transition>
   </div>
 </template>
-
-<script setup>
-import { ref, computed, watch } from "vue";
-import { useExpenses } from "../composables/useExpenses";
-
-const props = defineProps({
-  date: { type: String, required: true }, // format: YYYY-MM-DD
-});
-
-const month = computed(() => props.date.slice(0, 7));
-
-const {
-  getExpensesByDate,
-  getExpensesByMonth,
-  addExpense,
-  editExpense,
-  deleteExpense: removeExpense,
-  getTotalByDate,
-  getTotalByMonth,
-  getDailyBudget,
-  setDailyBudget,
-  getMonthlyBudget,
-  setMonthlyBudget,
-} = useExpenses();
-
-const form = ref({ amount: "", description: "", category: "" });
-const editingId = ref(null);
-
-const expensesToday = computed(() => getExpensesByDate(props.date));
-const totalToday = computed(() => getTotalByDate(props.date));
-const totalMonth = computed(() => getTotalByMonth(month.value));
-
-const dailyBudget = ref(getDailyBudget());
-const monthlyBudget = ref(getMonthlyBudget());
-const dailyBudgetInput = ref(dailyBudget.value);
-const monthlyBudgetInput = ref(monthlyBudget.value);
-
-const collapsed = ref(false);
-
-function toggleCollapse() {
-  collapsed.value = !collapsed.value;
-}
-
-function onSubmit() {
-  if (editingId.value) {
-    editExpense(editingId.value, {
-      amount: parseFloat(form.value.amount),
-      description: form.value.description,
-      category: form.value.category,
-    });
-    editingId.value = null;
-  } else {
-    addExpense({
-      date: props.date,
-      amount: parseFloat(form.value.amount),
-      description: form.value.description,
-      category: form.value.category,
-    });
-  }
-  form.value = { amount: "", description: "", category: "" };
-}
-
-function startEdit(expense) {
-  editingId.value = expense.id;
-  form.value = {
-    amount: expense.amount,
-    description: expense.description,
-    category: expense.category,
-  };
-}
-
-function cancelEdit() {
-  editingId.value = null;
-  form.value = { amount: "", description: "", category: "" };
-}
-
-function deleteExpense(id) {
-  removeExpense(id);
-  if (editingId.value === id) {
-    cancelEdit();
-  }
-}
-
-function updateDailyBudget() {
-  setDailyBudget(dailyBudgetInput.value);
-  dailyBudget.value = getDailyBudget();
-}
-function updateMonthlyBudget() {
-  setMonthlyBudget(monthlyBudgetInput.value);
-  monthlyBudget.value = getMonthlyBudget();
-}
-
-// Keep budgets in sync if changed elsewhere
-watch(
-  () => getDailyBudget(),
-  (val) => {
-    dailyBudget.value = val;
-    dailyBudgetInput.value = val;
-  }
-);
-watch(
-  () => getMonthlyBudget(),
-  (val) => {
-    monthlyBudget.value = val;
-    monthlyBudgetInput.value = val;
-  }
-);
-</script>
 
 <style scoped>
 .collapse-smooth-enter-active,
