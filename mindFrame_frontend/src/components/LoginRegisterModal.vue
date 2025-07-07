@@ -1,6 +1,13 @@
 <script setup>
 import { ref, watch } from "vue";
 import { useAuth } from "../composables/useAuth";
+import {
+  UserIcon,
+  LockClosedIcon,
+  XMarkIcon,
+  EyeIcon,
+  EyeSlashIcon,
+} from "@heroicons/vue/24/outline";
 
 const tab = ref("login");
 const username = ref("");
@@ -9,6 +16,7 @@ const error = ref("");
 const captchaQuestion = ref("");
 const captchaAnswer = ref("");
 const userCaptchaInput = ref("");
+const showPassword = ref(false);
 
 const { login, register } = useAuth();
 
@@ -81,14 +89,17 @@ const handleRegister = async () => {
   <div
     class="fixed inset-0 bg-opacity-50 overflow-y-auto h-full w-full backdrop-blur-sm flex items-center justify-center pt-10 pb-10 z-50"
   >
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative">
+    <div
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 relative animate-fade-in"
+    >
       <button
-        class="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+        class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
         @click="$emit('close')"
+        aria-label="Close"
       >
-        &times;
+        <XMarkIcon class="w-6 h-6 cursor-pointer" />
       </button>
-      <div class="flex mb-4 border-b">
+      <div class="flex mb-6 border-b">
         <button
           :class="tab === 'login' ? activeTabClass : inactiveTabClass"
           @click="tab = 'login'"
@@ -104,47 +115,92 @@ const handleRegister = async () => {
       </div>
       <form
         @submit.prevent="tab === 'login' ? handleLogin() : handleRegister()"
+        autocomplete="off"
       >
-        <div class="mb-4">
-          <label class="block text-gray-700 mb-1">Username</label>
-          <input
-            v-model="username"
-            class="w-full border rounded px-3 py-2"
-            required
-          />
+        <div class="mb-4 relative">
+          <label class="block text-gray-700 mb-1 font-medium">Username</label>
+          <div class="relative">
+            <span
+              class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            >
+              <UserIcon class="w-5 h-5" />
+            </span>
+            <input
+              v-model="username"
+              class="w-full border rounded-lg px-10 py-2 focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition"
+              required
+              placeholder="Enter your username"
+            />
+          </div>
         </div>
-        <div class="mb-4">
-          <label class="block text-gray-700 mb-1">Password</label>
-          <input
-            v-model="password"
-            type="password"
-            class="w-full border rounded px-3 py-2"
-            required
-          />
+        <div class="mb-4 relative">
+          <label class="block text-gray-700 mb-1 font-medium">Password</label>
+          <div class="relative">
+            <span
+              class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            >
+              <LockClosedIcon class="w-5 h-5" />
+            </span>
+            <input
+              v-model="password"
+              :type="showPassword ? 'text' : 'password'"
+              class="w-full border rounded-lg px-10 py-2 focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition pr-10"
+              required
+              placeholder="Enter your password"
+            />
+            <button
+              type="button"
+              @click="showPassword = !showPassword"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+            >
+              <component
+                :is="showPassword ? EyeSlashIcon : EyeIcon"
+                class="w-5 h-5"
+              />
+            </button>
+          </div>
         </div>
         <div v-if="tab === 'register'" class="mb-4">
-          <label class="block text-gray-700 mb-1"
+          <label class="block text-gray-700 mb-1 font-medium"
             >CAPTCHA: What is {{ captchaQuestion }}?</label
           >
           <input
             v-model="userCaptchaInput"
-            class="w-full border rounded px-3 py-2"
+            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition"
             required
             autocomplete="off"
             inputmode="numeric"
             pattern="[0-9]*"
+            placeholder="Answer"
           />
         </div>
-        <div v-if="error" class="mb-2 text-red-600 text-sm">{{ error }}</div>
+        <div v-if="error" class="mb-2 text-red-600 text-sm text-center">
+          {{ error }}
+        </div>
         <button
           type="submit"
-          class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+          class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition mt-2 shadow-md"
         >
-          {{ tab === "login" ? "Login" : "Register" }}
+          <span v-if="tab === 'login'">Login</span>
+          <span v-else>Register</span>
         </button>
       </form>
     </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in {
+  animation: fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+</style>

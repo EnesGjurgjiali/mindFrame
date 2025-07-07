@@ -13,10 +13,10 @@ const props = defineProps({
   },
 });
 
-const { getMood, setMood: saveMood } = useMoods();
+const { getMood, setMood: saveMood, moods } = useMoods();
 const selectedMood = ref(getMood(props.date) || null);
 
-const moods = [
+const moodOptions = [
   { value: 1, emoji: "😞" },
   { value: 2, emoji: "😐" },
   { value: 3, emoji: "🙂" },
@@ -26,7 +26,7 @@ const moods = [
 
 const selectedEmoji = computed(() => {
   if (!selectedMood.value) return null;
-  const mood = moods.find((m) => m.value === selectedMood.value);
+  const mood = moodOptions.find((m) => m.value === selectedMood.value);
   return mood ? mood.emoji : null;
 });
 
@@ -37,19 +37,22 @@ const setMood = (mood) => {
 };
 
 watch(
-  () => props.date,
-  (newDate) => {
+  [() => props.date, () => moods.value[props.date]],
+  ([newDate]) => {
     selectedMood.value = getMood(newDate) || null;
-  }
+  },
+  { immediate: true }
 );
 </script>
 
 <template>
   <div class="flex items-center space-x-2">
-    <span>{{ isEditable ? "How's your day going?" : "The day's mood was:" }}</span>
+    <span>{{
+      isEditable ? "How's your day going?" : "The day's mood was:"
+    }}</span>
     <template v-if="isEditable">
       <button
-        v-for="mood in moods"
+        v-for="mood in moodOptions"
         :key="mood.value"
         @click="setMood(mood.value)"
         :class="[

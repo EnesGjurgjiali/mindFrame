@@ -65,6 +65,7 @@ export function useExpenses() {
       const res = await axios.post(API_URL, newExpense);
       expenses.value.push(res.data);
       showToast("Expense added!");
+      await fetchExpenses();
     } catch (err) {
       console.error("Failed to add expense:", err);
     }
@@ -90,6 +91,7 @@ export function useExpenses() {
         };
       }
       showToast("Expense updated!");
+      await fetchExpenses();
     } catch (err) {
       console.error("Failed to edit expense:", err);
     }
@@ -106,6 +108,7 @@ export function useExpenses() {
         (e) => e._id !== id && e.id !== id
       );
       showToast("Expense deleted!");
+      await fetchExpenses();
     } catch (err) {
       console.error("Failed to delete expense:", err);
     }
