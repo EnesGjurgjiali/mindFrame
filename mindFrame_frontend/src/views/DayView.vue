@@ -23,7 +23,7 @@ const showMoodTracker = computed(() => {
 });
 
 const isMoodEditable = computed(() => {
-  return props.currentDate === today;
+  return props.currentDate <= today;
 });
 
 const {

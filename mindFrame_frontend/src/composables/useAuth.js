@@ -27,8 +27,13 @@ const login = async (username, password) => {
   showToast("Logged in successfully!");
 };
 
-const register = async (username, password) => {
-  const res = await axios.post(`${API_URL}/register`, { username, password });
+const register = async (username, password, captchaQuestion, captchaAnswer) => {
+  const res = await axios.post(`${API_URL}/register`, {
+    username,
+    password,
+    captchaQuestion,
+    captchaAnswer,
+  });
   token.value = res.data.token;
   user.value = { _id: res.data._id, username: res.data.username };
   localStorage.setItem(TOKEN_KEY, token.value);

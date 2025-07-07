@@ -1,11 +1,14 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useAuth } from "../composables/useAuth";
 
 const tab = ref("login");
 const username = ref("");
 const password = ref("");
 const error = ref("");
+const captchaQuestion = ref("");
+const captchaAnswer = ref("");
+const userCaptchaInput = ref("");
 
 const { login, register } = useAuth();
 
@@ -15,6 +18,29 @@ const inactiveTabClass =
   "flex-1 py-2 border-b-2 border-transparent text-gray-500";
 
 const emit = defineEmits(["close", "auth-success"]);
+
+function generateCaptcha() {
+  const a = Math.floor(Math.random() * 10) + 1;
+  const b = Math.floor(Math.random() * 10) + 1;
+  const ops = ["+", "-"];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  let left = a,
+    right = b;
+  if (op === "-" && a < b) {
+    left = b;
+    right = a;
+  }
+  captchaQuestion.value = `${left} ${op} ${right}`;
+  captchaAnswer.value = op === "+" ? left + right : left - right;
+  userCaptchaInput.value = "";
+}
+
+watch(tab, (newTab) => {
+  if (newTab === "register") generateCaptcha();
+});
+
+// Generate on mount if register tab is default
+if (tab.value === "register") generateCaptcha();
 
 const handleLogin = async () => {
   error.value = "";
@@ -33,14 +59,20 @@ const handleLogin = async () => {
 const handleRegister = async () => {
   error.value = "";
   try {
-    await register(username.value, password.value);
+    await register(
+      username.value,
+      password.value,
+      captchaQuestion.value,
+      userCaptchaInput.value
+    );
     username.value = "";
     password.value = "";
     error.value = "";
     emit("close");
     emit("auth-success");
   } catch (e) {
-    error.value = e.response?.data?.message || "Registration failed.";
+    error.value = e.response?.data?.error || "Registration failed.";
+    generateCaptcha(); // Regenerate on failure
   }
 };
 </script>
@@ -88,6 +120,19 @@ const handleRegister = async () => {
             type="password"
             class="w-full border rounded px-3 py-2"
             required
+          />
+        </div>
+        <div v-if="tab === 'register'" class="mb-4">
+          <label class="block text-gray-700 mb-1"
+            >CAPTCHA: What is {{ captchaQuestion }}?</label
+          >
+          <input
+            v-model="userCaptchaInput"
+            class="w-full border rounded px-3 py-2"
+            required
+            autocomplete="off"
+            inputmode="numeric"
+            pattern="[0-9]*"
           />
         </div>
         <div v-if="error" class="mb-2 text-red-600 text-sm">{{ error }}</div>
