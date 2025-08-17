@@ -4,7 +4,7 @@ import Header from "./components/Header.vue";
 import DayView from "./views/DayView.vue";
 import WeekView from "./views/WeekView.vue";
 import MonthView from "./views/MonthView.vue";
-import TimelineView from "./views/TimelineView.vue";
+import ExpenseView from "./views/ExpenseView.vue";
 import LoginRegisterModal from "./components/LoginRegisterModal.vue";
 import Toast from "./components/Toast.vue";
 import { toYYYYMMDD } from "./utils/date";
@@ -21,7 +21,7 @@ const views = {
   DayView,
   WeekView,
   MonthView,
-  TimelineView,
+  ExpenseView,
 };
 
 const setView = (view) => {
@@ -68,7 +68,7 @@ function handleLogout() {
         :is="views[currentView]"
         :current-date="currentDate"
         @change-date="changeDate"
-        v-if="currentView === 'DayView' || currentView === 'TimelineView'"
+        v-if="currentView === 'DayView'"
       />
       <component
         :is="views[currentView]"

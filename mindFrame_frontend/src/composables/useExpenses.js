@@ -55,7 +55,7 @@ export function useExpenses() {
 
   fetchExpenses();
 
-  const addExpense = async ({ date, amount, description, category, note }) => {
+  const addExpense = async ({ date, amount, description, note }) => {
     if (!isAuthenticated.value) {
       showToast("Please log in to add expenses.", "error");
       return;
@@ -65,7 +65,6 @@ export function useExpenses() {
         date,
         amount: parseFloat(amount),
         note: note || description,
-        category,
       };
       const res = await axios.post(API_URL, newExpense);
       expenses.value.push(res.data);

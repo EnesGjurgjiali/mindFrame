@@ -23,7 +23,7 @@ const {
   loading,
 } = useExpenses();
 
-const form = ref({ amount: "", description: "", category: "" });
+const form = ref({ amount: "", description: "" });
 const editingId = ref(null);
 
 const expensesToday = computed(() => getExpensesByDate(props.date));
@@ -46,7 +46,6 @@ function onSubmit() {
     editExpense(editingId.value, {
       amount: parseFloat(form.value.amount),
       description: form.value.description,
-      category: form.value.category,
     });
     editingId.value = null;
   } else {
@@ -54,10 +53,9 @@ function onSubmit() {
       date: props.date,
       amount: parseFloat(form.value.amount),
       description: form.value.description,
-      category: form.value.category,
     });
   }
-  form.value = { amount: "", description: "", category: "" };
+  form.value = { amount: "", description: "" };
 }
 
 function startEdit(expense) {
@@ -65,13 +63,12 @@ function startEdit(expense) {
   form.value = {
     amount: expense.amount,
     description: expense.description || expense.note,
-    category: expense.category,
   };
 }
 
 function cancelEdit() {
   editingId.value = null;
-  form.value = { amount: "", description: "", category: "" };
+  form.value = { amount: "", description: "" };
 }
 
 function deleteExpense(id) {
@@ -238,12 +235,6 @@ watch(
               required
               class="px-2 py-1 border border-gray-300 rounded w-full flex-1 text-sm"
             />
-            <input
-              v-model="form.category"
-              type="text"
-              placeholder="Category"
-              class="px-2 py-1 border border-gray-300 rounded w-full sm:w-28 text-sm"
-            />
             <div class="flex gap-2 w-full sm:w-auto">
               <button
                 type="submit"
@@ -273,9 +264,6 @@ watch(
                 >
                 <span class="mx-2 text-gray-500">-</span>
                 <span>{{ expense.description }}</span>
-                <span v-if="expense.category" class="ml-2 text-xs text-gray-400"
-                  >({{ expense.category }})</span
-                >
               </div>
               <div class="flex gap-2 mt-1 sm:mt-0">
                 <button
