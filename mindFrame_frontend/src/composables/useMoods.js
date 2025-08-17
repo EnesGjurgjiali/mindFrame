@@ -9,19 +9,24 @@ export function useMoods() {
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
   const moods = ref({});
+  const loading = ref(false);
 
   // Fetch all moods from backend if authenticated
   const fetchMoods = async () => {
+    loading.value = true;
     if (!isAuthenticated.value) {
       moods.value = {};
+      loading.value = false;
       return;
     }
     try {
       const res = await axios.get(API_URL);
       // Convert array to object by date
       moods.value = Object.fromEntries(res.data.map((m) => [m.date, m.value]));
+      loading.value = false;
     } catch (err) {
       console.error("Failed to fetch moods:", err);
+      loading.value = false;
     }
   };
 
@@ -38,14 +43,15 @@ export function useMoods() {
 
   const setMood = async (date, value) => {
     if (!isAuthenticated.value) {
-      alert("Please log in to set your mood.");
+      showToast("Please log in to set your mood.", "error");
       return;
     }
     try {
       const res = await axios.post(API_URL, { date, value });
       moods.value[date] = res.data.value;
-      showToast("Mood saved!");
+      showToast("Mood saved!", "success");
     } catch (err) {
+      showToast("Failed to set mood.", "error");
       console.error("Failed to set mood:", err);
     }
   };
@@ -55,5 +61,6 @@ export function useMoods() {
     fetchMoods,
     getMood,
     setMood,
+    loading,
   };
 }
