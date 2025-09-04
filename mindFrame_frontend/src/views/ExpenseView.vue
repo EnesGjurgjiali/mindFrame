@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useExpenses } from "../composables/useExpenses";
 import { toYYYYMMDD } from "../utils/date";
 
@@ -32,7 +32,7 @@ const monthString = computed(
 
 const monthExpenses = computed(() => getExpensesByMonth(monthString.value));
 const monthTotal = computed(() => getTotalByMonth(monthString.value));
-const monthlyBudget = ref(getMonthlyBudget());
+const monthlyBudget = ref(getMonthlyBudget(monthString.value));
 const monthlyBudgetInput = ref(monthlyBudget.value);
 
 const monthName = computed(() => {
@@ -95,9 +95,15 @@ function changeMonth(direction) {
   }
 }
 
+// Update monthly budget when month changes
+watch(monthString, (newMonth) => {
+  monthlyBudget.value = getMonthlyBudget(newMonth);
+  monthlyBudgetInput.value = monthlyBudget.value;
+});
+
 function updateMonthlyBudget() {
-  setMonthlyBudget(monthlyBudgetInput.value);
-  monthlyBudget.value = getMonthlyBudget();
+  setMonthlyBudget(monthlyBudgetInput.value, monthString.value);
+  monthlyBudget.value = getMonthlyBudget(monthString.value);
 }
 
 function onSubmit() {

@@ -31,7 +31,7 @@ const totalToday = computed(() => getTotalByDate(props.date));
 const totalMonth = computed(() => getTotalByMonth(month.value));
 
 const dailyBudget = ref(getDailyBudget(props.date));
-const monthlyBudget = ref(getMonthlyBudget());
+const monthlyBudget = ref(getMonthlyBudget(month.value));
 const dailyBudgetInput = ref(dailyBudget.value);
 const monthlyBudgetInput = ref(monthlyBudget.value);
 
@@ -83,8 +83,8 @@ function updateDailyBudget() {
   dailyBudget.value = getDailyBudget(props.date);
 }
 function updateMonthlyBudget() {
-  setMonthlyBudget(monthlyBudgetInput.value);
-  monthlyBudget.value = getMonthlyBudget();
+  setMonthlyBudget(monthlyBudgetInput.value, month.value);
+  monthlyBudget.value = getMonthlyBudget(month.value);
 }
 
 // Keep budgets in sync if changed elsewhere
@@ -96,7 +96,7 @@ watch(
   }
 );
 watch(
-  () => getMonthlyBudget(),
+  () => getMonthlyBudget(month.value),
   (val) => {
     monthlyBudget.value = val;
     monthlyBudgetInput.value = val;
