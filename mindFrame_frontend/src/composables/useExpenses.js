@@ -6,7 +6,7 @@ import { useToast } from "./useToast";
 const EXPENSES_KEY = "expenses";
 const DAILY_BUDGETS_KEY = "dailyBudgets";
 const MONTHLY_BUDGETS_KEY = "monthlyBudgets";
-const API_URL = "http://localhost:5000/api/expenses";
+const API_URL = `${process.env.BACKEND_API_URL}/expenses` || "http://localhost:5000/api/expenses";
 
 function loadExpenses() {
   return JSON.parse(localStorage.getItem(EXPENSES_KEY) || "[]");
