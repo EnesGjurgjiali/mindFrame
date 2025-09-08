@@ -3,7 +3,9 @@ import axios from "axios";
 import { useAuth } from "./useAuth";
 import { useToast } from "./useToast";
 
-const API_URL = "http://localhost:5000/api/moods";
+const BASE_API =
+  import.meta.env.VITE_BACKEND_API_URL || "http://localhost:5000/api";
+const API_URL = `${BASE_API}/moods`;
 
 export function useMoods() {
   const { isAuthenticated } = useAuth();

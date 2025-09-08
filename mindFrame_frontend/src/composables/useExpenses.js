@@ -5,8 +5,10 @@ import { useToast } from "./useToast";
 
 const EXPENSES_KEY = "expenses";
 const DAILY_BUDGETS_KEY = "dailyBudgets";
-const MONTHLY_BUDGET_KEY = "monthlyBudget";
-const API_URL = "http://localhost:5000/api/expenses";
+const MONTHLY_BUDGETS_KEY = "monthlyBudgets";
+const BASE_API =
+  import.meta.env.VITE_BACKEND_API_URL || "http://localhost:5000/api";
+const API_URL = `${BASE_API}/expenses`;
 
 function loadExpenses() {
   return JSON.parse(localStorage.getItem(EXPENSES_KEY) || "[]");
@@ -156,11 +158,29 @@ export function useExpenses() {
     }
     return 0;
   }
-  function setMonthlyBudget(amount) {
-    localStorage.setItem(MONTHLY_BUDGET_KEY, amount);
+  function setMonthlyBudget(amount, month) {
+    // month: 'YYYY-MM'
+    const budgets = JSON.parse(localStorage.getItem(MONTHLY_BUDGETS_KEY) || "{}");
+    budgets[month] = amount;
+    localStorage.setItem(MONTHLY_BUDGETS_KEY, JSON.stringify(budgets));
   }
-  function getMonthlyBudget() {
-    return parseFloat(localStorage.getItem(MONTHLY_BUDGET_KEY) || "0");
+  function getMonthlyBudget(month) {
+    // month: 'YYYY-MM'
+    const budgets = JSON.parse(localStorage.getItem(MONTHLY_BUDGETS_KEY) || "{}");
+    if (budgets[month] !== undefined) {
+      return parseFloat(budgets[month]);
+    }
+    // Try previous months
+    let prev = new Date(month + "-01");
+    for (let i = 0; i < 12; i++) {
+      // look back up to 12 months
+      prev.setMonth(prev.getMonth() - 1);
+      const prevStr = prev.toISOString().slice(0, 7);
+      if (budgets[prevStr] !== undefined) {
+        return parseFloat(budgets[prevStr]);
+      }
+    }
+    return 0;
   }
 
   return {

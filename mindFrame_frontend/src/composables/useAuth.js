@@ -2,7 +2,9 @@ import { ref, computed } from "vue";
 import axios from "axios";
 import { useToast } from "./useToast";
 
-const API_URL = "http://localhost:5000/api/auth";
+const BASE_API =
+  import.meta.env.VITE_BACKEND_API_URL || "http://localhost:5000/api";
+const API_URL = `${BASE_API}/auth`;
 const TOKEN_KEY = "auth_token";
 const USER_KEY = "auth_user";
 
