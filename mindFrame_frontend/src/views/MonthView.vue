@@ -6,9 +6,13 @@ import { toYYYYMMDD } from "../utils/date";
 import { getTaskCardClass } from "../utils/taskUtils";
 import { useExpenses } from "../composables/useExpenses";
 
-const { tasks } = useTasks();
+const { tasks, loading: tasksLoading } = useTasks();
 const { moods } = useMoods();
-const { getExpensesByDate, getTotalByMonth } = useExpenses();
+const {
+  getExpensesByDate,
+  getTotalByMonth,
+  loading: expensesLoading,
+} = useExpenses();
 const today = toYYYYMMDD(new Date());
 
 const tasksByDate = computed(() => {
@@ -145,146 +149,172 @@ const monthTotal = computed(() => getTotalByMonth(monthString.value));
         &gt;
       </button>
     </div>
-    <div class="flex gap-2 mb-4">
-      <button
-        :class="
-          viewMode === 'tasks'
-            ? 'bg-blue-500 text-white'
-            : 'bg-gray-200 text-gray-700'
-        "
-        class="px-4 py-2 rounded-l-lg font-semibold focus:outline-none"
-        @click="viewMode = 'tasks'"
-      >
-        Tasks
-      </button>
-      <button
-        :class="
-          viewMode === 'expenses'
-            ? 'bg-blue-500 text-white'
-            : 'bg-gray-200 text-gray-700'
-        "
-        class="px-4 py-2 rounded-r-lg font-semibold focus:outline-none"
-        @click="viewMode = 'expenses'"
-      >
-        Expenses
-      </button>
+    <div
+      v-if="tasksLoading || expensesLoading"
+      class="flex justify-center items-center py-8"
+    >
+      <span class="loader"></span>
     </div>
-    <div v-if="viewMode === 'tasks'">
-      <div class="overflow-x-auto">
-        <div
-          class="grid grid-cols-7 gap-px sm:gap-1 bg-gray-200 border-l border-t border-gray-200 min-w-[500px]"
+    <template v-else>
+      <div class="flex gap-2 mb-4">
+        <button
+          :class="
+            viewMode === 'tasks'
+              ? 'bg-blue-500 text-white'
+              : 'bg-gray-200 text-gray-700'
+          "
+          class="px-4 py-2 rounded-l-lg font-semibold focus:outline-none"
+          @click="viewMode = 'tasks'"
         >
-          <div
-            v-for="dayName in dayNames"
-            :key="dayName"
-            class="py-2 text-center font-semibold bg-white border-r border-b border-gray-200 text-xs sm:text-sm text-gray-800"
-          >
-            {{ dayName }}
-          </div>
-          <div
-            v-for="day in days"
-            :key="day.date"
-            class="p-2 h-32 bg-white border-r border-b border-gray-200 overflow-y-auto cursor-pointer hover:bg-gray-100 text-xs sm:text-sm text-gray-800"
-            :class="{ 'bg-gray-50': !day.isCurrentMonth }"
-            @click="selectDay(day)"
-          >
-            <div class="flex justify-between items-center">
-              <div
-                class="font-semibold"
-                :class="{
-                  'text-gray-400': !day.isCurrentMonth,
-                  'text-white bg-blue-600 rounded-full h-8 w-8 flex items-center justify-center':
-                    day.date === today && day.isCurrentMonth,
-                }"
-              >
-                {{ day.dayOfMonth }}
-              </div>
-              <div v-if="moods[day.date]" class="text-xl">
-                {{ moodEmojis[moods[day.date]] }}
-              </div>
-            </div>
-            <div class="mt-1 space-y-1">
-              <div
-                v-for="task in tasksByDate[day.date]"
-                :key="task.id"
-                class="text-xs p-1 rounded"
-                :class="getTaskCardClass(task.type)"
-              >
-                {{ task.title }}
-              </div>
-            </div>
-          </div>
-        </div>
+          Tasks
+        </button>
+        <button
+          :class="
+            viewMode === 'expenses'
+              ? 'bg-blue-500 text-white'
+              : 'bg-gray-200 text-gray-700'
+          "
+          class="px-4 py-2 rounded-r-lg font-semibold focus:outline-none"
+          @click="viewMode = 'expenses'"
+        >
+          Expenses
+        </button>
       </div>
-    </div>
-    <div v-else>
-      <div class="overflow-x-auto">
-        <div
-          class="grid grid-cols-7 gap-px sm:gap-1 bg-gray-200 border-l border-t border-gray-200 min-w-[500px]"
-        >
+      <div v-if="viewMode === 'tasks'">
+        <div class="overflow-x-auto">
           <div
-            v-for="dayName in dayNames"
-            :key="dayName"
-            class="py-2 text-center font-semibold bg-white border-r border-b border-gray-200 text-xs sm:text-sm text-gray-800"
+            class="grid grid-cols-7 gap-px sm:gap-1 bg-gray-200 border-l border-t border-gray-200 min-w-[500px]"
           >
-            {{ dayName }}
-          </div>
-          <div
-            v-for="day in days"
-            :key="day.date"
-            class="p-2 h-32 bg-white border-r border-b border-gray-100 overflow-y-auto text-xs sm:text-sm text-gray-800"
-            :class="{ 'bg-gray-50': !day.isCurrentMonth }"
-          >
-            <div class="flex justify-between items-center mb-1">
-              <div
-                class="font-semibold"
-                :class="{
-                  'text-gray-400': !day.isCurrentMonth,
-                  'text-white bg-blue-600 rounded-full h-8 w-8 flex items-center justify-center':
-                    day.date === today && day.isCurrentMonth,
-                }"
-              >
-                {{ day.dayOfMonth }}
-              </div>
-              <div class="text-xs text-blue-600 font-bold">
-                {{
-                  getExpensesByDate(day.date)
-                    .reduce((sum, e) => sum + e.amount, 0)
-                    .toFixed(2)
-                }}
-                €
-              </div>
-            </div>
-            <ul
-              class="mt-1 w-full text-xs text-gray-500 max-h-16 overflow-y-auto"
+            <div
+              v-for="dayName in dayNames"
+              :key="dayName"
+              class="py-2 text-center font-semibold bg-white border-r border-b border-gray-200 text-xs sm:text-sm text-gray-800"
             >
-              <li
-                v-for="expense in getExpensesByDate(day.date)"
-                :key="expense._id"
-              >
-                {{ expense.description }}
-                <span class="float-right"
-                  >{{ expense.amount.toFixed(2) }} €</span
+              {{ dayName }}
+            </div>
+            <div
+              v-for="day in days"
+              :key="day.date"
+              class="p-2 h-32 bg-white border-r border-b border-gray-200 overflow-y-auto cursor-pointer hover:bg-gray-100 text-xs sm:text-sm text-gray-800"
+              :class="{ 'bg-gray-50': !day.isCurrentMonth }"
+              @click="selectDay(day)"
+            >
+              <div class="flex justify-between items-center">
+                <div
+                  class="font-semibold"
+                  :class="{
+                    'text-gray-400': !day.isCurrentMonth,
+                    'text-white bg-blue-600 rounded-full h-8 w-8 flex items-center justify-center':
+                      day.date === today && day.isCurrentMonth,
+                  }"
                 >
-              </li>
-              <li
-                v-if="getExpensesByDate(day.date).length === 0"
-                class="italic text-gray-300"
-              >
-                No expenses
-              </li>
-            </ul>
+                  {{ day.dayOfMonth }}
+                </div>
+                <div v-if="moods[day.date]" class="text-xl">
+                  {{ moodEmojis[moods[day.date]] }}
+                </div>
+              </div>
+              <div class="mt-1 space-y-1">
+                <div
+                  v-for="task in tasksByDate[day.date]"
+                  :key="task.id"
+                  class="text-xs p-1 rounded"
+                  :class="getTaskCardClass(task.type)"
+                >
+                  {{ task.title }}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="mt-6 text-center">
-        <span class="font-semibold text-lg">Total this month: </span>
-        <span class="text-blue-600 font-bold text-lg"
-          >{{ monthTotal.toFixed(2) }} €</span
-        >
+      <div v-else>
+        <div class="overflow-x-auto">
+          <div
+            class="grid grid-cols-7 gap-px sm:gap-1 bg-gray-200 border-l border-t border-gray-200 min-w-[500px]"
+          >
+            <div
+              v-for="dayName in dayNames"
+              :key="dayName"
+              class="py-2 text-center font-semibold bg-white border-r border-b border-gray-200 text-xs sm:text-sm text-gray-800"
+            >
+              {{ dayName }}
+            </div>
+            <div
+              v-for="day in days"
+              :key="day.date"
+              class="p-2 h-32 bg-white border-r border-b border-gray-100 overflow-y-auto text-xs sm:text-sm text-gray-800"
+              :class="{ 'bg-gray-50': !day.isCurrentMonth }"
+            >
+              <div class="flex justify-between items-center mb-1">
+                <div
+                  class="font-semibold"
+                  :class="{
+                    'text-gray-400': !day.isCurrentMonth,
+                    'text-white bg-blue-600 rounded-full h-8 w-8 flex items-center justify-center':
+                      day.date === today && day.isCurrentMonth,
+                  }"
+                >
+                  {{ day.dayOfMonth }}
+                </div>
+                <div class="text-xs text-blue-600 font-bold">
+                  {{
+                    getExpensesByDate(day.date)
+                      .reduce((sum, e) => sum + e.amount, 0)
+                      .toFixed(2)
+                  }}
+                  €
+                </div>
+              </div>
+              <ul
+                class="mt-1 w-full text-xs text-gray-500 max-h-16 overflow-y-auto"
+              >
+                <li
+                  v-for="expense in getExpensesByDate(day.date)"
+                  :key="expense._id"
+                >
+                  {{ expense.description }}
+                  <span class="float-right"
+                    >{{ expense.amount.toFixed(2) }} €</span
+                  >
+                </li>
+                <li
+                  v-if="getExpensesByDate(day.date).length === 0"
+                  class="italic text-gray-300"
+                >
+                  No expenses
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 text-center">
+          <span class="font-semibold text-lg">Total this month: </span>
+          <span class="text-blue-600 font-bold text-lg"
+            >{{ monthTotal.toFixed(2) }} €</span
+          >
+        </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.loader {
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+</style>

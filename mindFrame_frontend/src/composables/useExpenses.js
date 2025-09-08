@@ -5,7 +5,7 @@ import { useToast } from "./useToast";
 
 const EXPENSES_KEY = "expenses";
 const DAILY_BUDGETS_KEY = "dailyBudgets";
-const MONTHLY_BUDGET_KEY = "monthlyBudget";
+const MONTHLY_BUDGETS_KEY = "monthlyBudgets";
 const API_URL = "http://localhost:5000/api/expenses";
 
 function loadExpenses() {
@@ -24,11 +24,14 @@ export function useExpenses() {
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
   const expenses = ref([]);
+  const loading = ref(false);
 
   // Fetch all expenses from backend if authenticated
   const fetchExpenses = async () => {
+    loading.value = true;
     if (!isAuthenticated.value) {
       expenses.value = [];
+      loading.value = false;
       return;
     }
     try {
@@ -38,8 +41,10 @@ export function useExpenses() {
         ...e,
         description: e.description || e.note || "",
       }));
+      loading.value = false;
     } catch (err) {
       console.error("Failed to fetch expenses:", err);
+      loading.value = false;
     }
   };
 
@@ -50,9 +55,9 @@ export function useExpenses() {
 
   fetchExpenses();
 
-  const addExpense = async ({ date, amount, description, category, note }) => {
+  const addExpense = async ({ date, amount, description, note }) => {
     if (!isAuthenticated.value) {
-      alert("Please log in to add expenses.");
+      showToast("Please log in to add expenses.", "error");
       return;
     }
     try {
@@ -60,20 +65,20 @@ export function useExpenses() {
         date,
         amount: parseFloat(amount),
         note: note || description,
-        category,
       };
       const res = await axios.post(API_URL, newExpense);
       expenses.value.push(res.data);
-      showToast("Expense added!");
+      showToast("Expense added!", "success");
       await fetchExpenses();
     } catch (err) {
+      showToast("Failed to add expense.", "error");
       console.error("Failed to add expense:", err);
     }
   };
 
   const editExpense = async (id, updated) => {
     if (!isAuthenticated.value) {
-      alert("Please log in to edit expenses.");
+      showToast("Please log in to edit expenses.", "error");
       return;
     }
     try {
@@ -90,16 +95,17 @@ export function useExpenses() {
           description: res.data.description || res.data.note || "",
         };
       }
-      showToast("Expense updated!");
+      showToast("Expense updated!", "success");
       await fetchExpenses();
     } catch (err) {
+      showToast("Failed to edit expense.", "error");
       console.error("Failed to edit expense:", err);
     }
   };
 
   const deleteExpense = async (id) => {
     if (!isAuthenticated.value) {
-      alert("Please log in to delete expenses.");
+      showToast("Please log in to delete expenses.", "error");
       return;
     }
     try {
@@ -107,9 +113,10 @@ export function useExpenses() {
       expenses.value = expenses.value.filter(
         (e) => e._id !== id && e.id !== id
       );
-      showToast("Expense deleted!");
+      showToast("Expense deleted!", "success");
       await fetchExpenses();
     } catch (err) {
+      showToast("Failed to delete expense.", "error");
       console.error("Failed to delete expense:", err);
     }
   };
@@ -156,16 +163,35 @@ export function useExpenses() {
     }
     return 0;
   }
-  function setMonthlyBudget(amount) {
-    localStorage.setItem(MONTHLY_BUDGET_KEY, amount);
+  function setMonthlyBudget(amount, month) {
+    // month: 'YYYY-MM'
+    const budgets = JSON.parse(localStorage.getItem(MONTHLY_BUDGETS_KEY) || "{}");
+    budgets[month] = amount;
+    localStorage.setItem(MONTHLY_BUDGETS_KEY, JSON.stringify(budgets));
   }
-  function getMonthlyBudget() {
-    return parseFloat(localStorage.getItem(MONTHLY_BUDGET_KEY) || "0");
+  function getMonthlyBudget(month) {
+    // month: 'YYYY-MM'
+    const budgets = JSON.parse(localStorage.getItem(MONTHLY_BUDGETS_KEY) || "{}");
+    if (budgets[month] !== undefined) {
+      return parseFloat(budgets[month]);
+    }
+    // Try previous months
+    let prev = new Date(month + "-01");
+    for (let i = 0; i < 12; i++) {
+      // look back up to 12 months
+      prev.setMonth(prev.getMonth() - 1);
+      const prevStr = prev.toISOString().slice(0, 7);
+      if (budgets[prevStr] !== undefined) {
+        return parseFloat(budgets[prevStr]);
+      }
+    }
+    return 0;
   }
 
   return {
     expenses,
     fetchExpenses,
+    loading,
     addExpense,
     editExpense,
     deleteExpense,
