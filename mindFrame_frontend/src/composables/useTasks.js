@@ -6,7 +6,7 @@ import { toYYYYMMDD } from "../utils/date";
 import { useAuth } from "./useAuth";
 import { useToast } from "./useToast";
 
-const API_URL = "http://localhost:5000/api/tasks";
+const API_URL = `${process.env.BACKEND_API_URL}/tasks` || "http://localhost:5000/api/tasks";
 
 export function useTasks(date = null) {
   const { isAuthenticated } = useAuth();
