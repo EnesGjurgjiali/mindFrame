@@ -26,11 +26,14 @@ export function useExpenses() {
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
   const expenses = ref([]);
+  const loading = ref(false);
 
   // Fetch all expenses from backend if authenticated
   const fetchExpenses = async () => {
+    loading.value = true;
     if (!isAuthenticated.value) {
       expenses.value = [];
+      loading.value = false;
       return;
     }
     try {
@@ -40,8 +43,10 @@ export function useExpenses() {
         ...e,
         description: e.description || e.note || "",
       }));
+      loading.value = false;
     } catch (err) {
       console.error("Failed to fetch expenses:", err);
+      loading.value = false;
     }
   };
 
@@ -52,9 +57,9 @@ export function useExpenses() {
 
   fetchExpenses();
 
-  const addExpense = async ({ date, amount, description, category, note }) => {
+  const addExpense = async ({ date, amount, description, note }) => {
     if (!isAuthenticated.value) {
-      alert("Please log in to add expenses.");
+      showToast("Please log in to add expenses.", "error");
       return;
     }
     try {
@@ -62,20 +67,20 @@ export function useExpenses() {
         date,
         amount: parseFloat(amount),
         note: note || description,
-        category,
       };
       const res = await axios.post(API_URL, newExpense);
       expenses.value.push(res.data);
-      showToast("Expense added!");
+      showToast("Expense added!", "success");
       await fetchExpenses();
     } catch (err) {
+      showToast("Failed to add expense.", "error");
       console.error("Failed to add expense:", err);
     }
   };
 
   const editExpense = async (id, updated) => {
     if (!isAuthenticated.value) {
-      alert("Please log in to edit expenses.");
+      showToast("Please log in to edit expenses.", "error");
       return;
     }
     try {
@@ -92,16 +97,17 @@ export function useExpenses() {
           description: res.data.description || res.data.note || "",
         };
       }
-      showToast("Expense updated!");
+      showToast("Expense updated!", "success");
       await fetchExpenses();
     } catch (err) {
+      showToast("Failed to edit expense.", "error");
       console.error("Failed to edit expense:", err);
     }
   };
 
   const deleteExpense = async (id) => {
     if (!isAuthenticated.value) {
-      alert("Please log in to delete expenses.");
+      showToast("Please log in to delete expenses.", "error");
       return;
     }
     try {
@@ -109,9 +115,10 @@ export function useExpenses() {
       expenses.value = expenses.value.filter(
         (e) => e._id !== id && e.id !== id
       );
-      showToast("Expense deleted!");
+      showToast("Expense deleted!", "success");
       await fetchExpenses();
     } catch (err) {
+      showToast("Failed to delete expense.", "error");
       console.error("Failed to delete expense:", err);
     }
   };
@@ -186,6 +193,7 @@ export function useExpenses() {
   return {
     expenses,
     fetchExpenses,
+    loading,
     addExpense,
     editExpense,
     deleteExpense,

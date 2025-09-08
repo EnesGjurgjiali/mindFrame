@@ -14,6 +14,7 @@ export function useTasks(date = null) {
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
   const allTasks = useLocalStorage("tasks", []);
+  const loading = ref(false);
 
   const tasks = computed(() => {
     if (date && date.value) {
@@ -24,15 +25,19 @@ export function useTasks(date = null) {
 
   // Fetch all tasks from backend if authenticated
   const fetchTasks = async () => {
+    loading.value = true;
     if (!isAuthenticated.value) {
       allTasks.value = [];
+      loading.value = false;
       return;
     }
     try {
       const res = await axios.get(API_URL);
       allTasks.value = res.data;
+      loading.value = false;
     } catch (err) {
       console.error("Failed to fetch tasks:", err);
+      loading.value = false;
     }
   };
 
@@ -46,15 +51,16 @@ export function useTasks(date = null) {
   // Add a new task
   const addTask = async (task, taskDate) => {
     if (!isAuthenticated.value) {
-      alert("Please log in to add tasks.");
+      showToast("Please log in to add tasks.", "error");
       return;
     }
     try {
       const newTask = { ...task, date: taskDate || task.date };
       const res = await axios.post(API_URL, newTask);
       allTasks.value.push(res.data);
-      showToast("Task added!");
+      showToast("Task added!", "success");
     } catch (err) {
+      showToast("Failed to add task.", "error");
       console.error("Failed to add task:", err);
     }
   };
@@ -62,7 +68,7 @@ export function useTasks(date = null) {
   // Edit a task
   const editTask = async (updatedTask) => {
     if (!isAuthenticated.value) {
-      alert("Please log in to edit tasks.");
+      showToast("Please log in to edit tasks.", "error");
       return;
     }
     try {
@@ -77,8 +83,9 @@ export function useTasks(date = null) {
       if (idx !== -1) {
         allTasks.value[idx] = { ...res.data };
       }
-      showToast("Task updated!");
+      showToast("Task updated!", "success");
     } catch (err) {
+      showToast("Failed to edit task.", "error");
       console.error("Failed to edit task:", err);
     }
   };
@@ -86,7 +93,7 @@ export function useTasks(date = null) {
   // Delete a task
   const deleteTask = async (taskId) => {
     if (!isAuthenticated.value) {
-      alert("Please log in to delete tasks.");
+      showToast("Please log in to delete tasks.", "error");
       return;
     }
     try {
@@ -94,8 +101,9 @@ export function useTasks(date = null) {
       allTasks.value = allTasks.value.filter(
         (t) => t._id !== taskId && t.id !== taskId
       );
-      showToast("Task deleted!");
+      showToast("Task deleted!", "success");
     } catch (err) {
+      showToast("Failed to delete task.", "error");
       console.error("Failed to delete task:", err);
     }
   };
@@ -103,7 +111,7 @@ export function useTasks(date = null) {
   // Update task order (bulk update)
   const updateTaskOrder = async (newTasks) => {
     if (!isAuthenticated.value) {
-      alert("Please log in to reorder tasks.");
+      showToast("Please log in to reorder tasks.", "error");
       return;
     }
     allTasks.value = newTasks;
@@ -112,7 +120,7 @@ export function useTasks(date = null) {
   // Toggle completion
   const toggleTaskCompletion = async (taskId) => {
     if (!isAuthenticated.value) {
-      alert("Please log in to complete tasks.");
+      showToast("Please log in to complete tasks.", "error");
       return;
     }
     const task = allTasks.value.find(
@@ -126,6 +134,7 @@ export function useTasks(date = null) {
   return {
     tasks,
     fetchTasks,
+    loading,
     addTask,
     editTask,
     deleteTask,

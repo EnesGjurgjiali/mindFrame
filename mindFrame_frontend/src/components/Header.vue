@@ -7,7 +7,7 @@ import {
   CalendarDaysIcon,
   CalendarIcon,
   Squares2X2Icon,
-  ClockIcon,
+  BanknotesIcon,
   UserIcon,
   ArrowRightOnRectangleIcon,
   ArrowLeftOnRectangleIcon,
@@ -38,7 +38,7 @@ const navItems = [
   { view: "DayView", label: "Day", icon: CalendarDaysIcon },
   { view: "WeekView", label: "Week", icon: CalendarIcon },
   { view: "MonthView", label: "Month", icon: Squares2X2Icon },
-  { view: "TimelineView", label: "Timeline", icon: ClockIcon },
+  { view: "ExpenseView", label: "Expenses", icon: BanknotesIcon },
 ];
 </script>
 
